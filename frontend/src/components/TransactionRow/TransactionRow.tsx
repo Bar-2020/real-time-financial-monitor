@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import type { Row } from '../../types'
+import type { DisplayedTransaction } from '../../types'
 import './TransactionRow.css'
 
 // Intl formatters are slow to create and rows render in bursts, so each one is created once.
@@ -15,7 +15,7 @@ function formatAmount(amount: number, currency: string) {
   return amountFormat.format(amount)
 }
 
-export const TransactionRow = memo(function TransactionRow({ row }: { row: Row }) {
+export const TransactionRow = memo(function TransactionRow({ row }: { row: DisplayedTransaction }) {
   return (
     <tr className={row.animate ? 'row-enter' : undefined}>
       <td title={row.transactionId}>{row.transactionId.slice(0, 8)}</td>

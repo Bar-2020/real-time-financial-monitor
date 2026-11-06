@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { createTransactionHub } from '../api/transactions'
 import { FLUSH_INTERVAL_MS, RETRY_DELAY_MS } from '../constants'
-import type { ConnectionState, Row, Transaction } from '../types'
+import type { ConnectionState, DisplayedTransaction, Transaction } from '../types'
 import { mergeTransactions } from '../utils/transactions'
 
 export function useTransactions() {
-  const [rows, setRows] = useState<Row[]>([])
+  const [rows, setRows] = useState<DisplayedTransaction[]>([])
   const [connection, setConnection] = useState<ConnectionState>('connecting')
 
   useEffect(() => {

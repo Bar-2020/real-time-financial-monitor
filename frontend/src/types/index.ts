@@ -10,6 +10,6 @@ export interface Transaction {
   timestamp: string
 }
 
-export type Row = Transaction & { animate: boolean }
+export type DisplayedTransaction = Transaction & { animate: boolean }
 
 export type ConnectionState = 'connecting' | 'live' | 'reconnecting'

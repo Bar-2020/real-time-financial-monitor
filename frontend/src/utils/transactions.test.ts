@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { MAX_ROWS } from '../constants'
-import type { Row, Transaction } from '../types'
+import type { DisplayedTransaction, Transaction } from '../types'
 import { createMockTransaction, mergeTransactions, settleTransaction } from './transactions'
 
 const makeTransaction = (id: string, status: Transaction['status'] = 'Pending', second = 0): Transaction => ({
@@ -11,7 +11,7 @@ const makeTransaction = (id: string, status: Transaction['status'] = 'Pending', 
   timestamp: new Date(Date.UTC(2024, 0, 15, 10, 0, second)).toISOString(),
 })
 
-const ids = (rows: Row[]) => rows.map((row) => row.transactionId)
+const ids = (rows: DisplayedTransaction[]) => rows.map((row) => row.transactionId)
 
 describe('createMockTransaction', () => {
   it('matches the shape the API validates', () => {

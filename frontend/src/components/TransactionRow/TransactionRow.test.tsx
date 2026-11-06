@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import type { Row } from '../../types'
+import type { DisplayedTransaction } from '../../types'
 import { TransactionRow } from './TransactionRow'
 
-const row: Row = {
+const row: DisplayedTransaction = {
   transactionId: '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b',
   amount: 1500.5,
   currency: 'USD',
@@ -12,7 +12,7 @@ const row: Row = {
   animate: false,
 }
 
-const renderRow = (overrides: Partial<Row> = {}) =>
+const renderRow = (overrides: Partial<DisplayedTransaction> = {}) =>
   render(
     <table>
       <tbody>

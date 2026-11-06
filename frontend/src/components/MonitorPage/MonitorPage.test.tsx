@@ -1,12 +1,12 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useTransactions } from '../../hooks/useTransactions'
-import type { ConnectionState, Row, Transaction } from '../../types'
+import type { ConnectionState, DisplayedTransaction, Transaction } from '../../types'
 import { MonitorPage } from './MonitorPage'
 
 vi.mock('../../hooks/useTransactions', () => ({ useTransactions: vi.fn() }))
 
-const makeRow = (id: string, status: Transaction['status']): Row => ({
+const makeRow = (id: string, status: Transaction['status']): DisplayedTransaction => ({
   transactionId: id,
   amount: 1500.5,
   currency: 'USD',
@@ -24,8 +24,8 @@ const rows = [
 
 const bodyRows = () => screen.getAllByRole('row').slice(1)
 
-function show(data: Row[], connection: ConnectionState = 'live') {
-  vi.mocked(useTransactions).mockReturnValue({ rows: data, connection })
+function show(displayedRows: DisplayedTransaction[], connection: ConnectionState = 'live') {
+  vi.mocked(useTransactions).mockReturnValue({ rows: displayedRows, connection })
   render(<MonitorPage />)
 }
 
