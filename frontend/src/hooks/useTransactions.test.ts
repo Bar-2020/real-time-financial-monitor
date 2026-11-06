@@ -1,7 +1,8 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { Transaction } from './transaction'
-import { FLUSH_INTERVAL_MS, RETRY_DELAY_MS, useTransactions } from './useTransactions'
+import { FLUSH_INTERVAL_MS, RETRY_DELAY_MS } from '../constants'
+import type { Transaction } from '../types'
+import { useTransactions } from './useTransactions'
 
 const fake = vi.hoisted(() => ({
   handlers: {} as Record<string, (payload: unknown) => void>,
@@ -40,7 +41,7 @@ vi.mock('@microsoft/signalr', () => ({
   },
 }))
 
-const tx = (id: string, second = 0): Transaction => ({
+const makeTransaction = (id: string, second = 0): Transaction => ({
   transactionId: id,
   amount: 10,
   currency: 'USD',
@@ -88,7 +89,7 @@ describe('useTransactions', () => {
     const before = counter.renders
 
     act(() => {
-      for (let i = 0; i < 100; i++) fake.handlers.transaction(tx(`id-${i}`))
+      for (let index = 0; index < 100; index++) fake.handlers.transaction(makeTransaction(`id-${index}`))
     })
     expect(counter.renders).toBe(before)
     expect(result.current.rows).toHaveLength(0)
@@ -114,7 +115,7 @@ describe('useTransactions', () => {
   it('shows the snapshot newest first without animating it', async () => {
     const { result } = await renderConnected()
 
-    act(() => fake.handlers.snapshot([tx('newest', 2), tx('oldest', 1)]))
+    act(() => fake.handlers.snapshot([makeTransaction('newest', 2), makeTransaction('oldest', 1)]))
 
     expect(result.current.rows.map((row) => row.transactionId)).toEqual(['newest', 'oldest'])
     expect(result.current.rows.every((row) => !row.animate)).toBe(true)
@@ -122,9 +123,9 @@ describe('useTransactions', () => {
 
   it('merges a reconnect snapshot with rows already on screen', async () => {
     const { result } = await renderConnected()
-    act(() => fake.handlers.snapshot([tx('a', 1)]))
+    act(() => fake.handlers.snapshot([makeTransaction('a', 1)]))
 
-    act(() => fake.handlers.snapshot([tx('b', 2), tx('a', 1)]))
+    act(() => fake.handlers.snapshot([makeTransaction('b', 2), makeTransaction('a', 1)]))
 
     expect(result.current.rows.map((row) => row.transactionId)).toEqual(['b', 'a'])
   })

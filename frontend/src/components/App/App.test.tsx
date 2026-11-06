@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router'
 import { describe, expect, it, vi } from 'vitest'
 import { App } from './App'
 
-vi.mock('./useTransactions', () => ({
+vi.mock('../../hooks/useTransactions', () => ({
   useTransactions: () => ({ rows: [], connection: 'live' }),
 }))
 

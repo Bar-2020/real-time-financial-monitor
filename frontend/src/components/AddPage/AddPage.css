@@ -1,0 +1,10 @@
+.add-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.add-page-error {
+  color: var(--failed-text);
+}

@@ -1,12 +1,13 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { AddPage, BURST_SIZE, STATUS_FOLLOW_UP_MS } from './AddPage'
-import type { Transaction } from './transaction'
+import { BURST_SIZE, STATUS_FOLLOW_UP_MS } from '../../constants'
+import type { Transaction } from '../../types'
+import { AddPage } from './AddPage'
 
 const fetchMock = vi.fn<typeof fetch>()
 
 const sentBodies = () =>
-  fetchMock.mock.calls.map(([, init]) => JSON.parse(init?.body as string) as Transaction)
+  fetchMock.mock.calls.map(([, options]) => JSON.parse(options?.body as string) as Transaction)
 
 async function click(name: string) {
   await act(async () => {
@@ -14,9 +15,9 @@ async function click(name: string) {
   })
 }
 
-async function advance(ms: number) {
+async function advance(milliseconds: number) {
   await act(async () => {
-    await vi.advanceTimersByTimeAsync(ms)
+    await vi.advanceTimersByTimeAsync(milliseconds)
   })
 }
 
@@ -38,10 +39,10 @@ describe('AddPage', () => {
     await click('Send 1')
 
     expect(fetchMock).toHaveBeenCalledOnce()
-    const [url, init] = fetchMock.mock.calls[0]
+    const [url, options] = fetchMock.mock.calls[0]
     expect(url).toBe('/api/transactions')
-    expect(init?.method).toBe('POST')
-    expect(new Headers(init?.headers).get('Content-Type')).toBe('application/json')
+    expect(options?.method).toBe('POST')
+    expect(new Headers(options?.headers).get('Content-Type')).toBe('application/json')
     expect(sentBodies()[0].status).toBe('Pending')
   })
 
@@ -50,7 +51,7 @@ describe('AddPage', () => {
 
     await click(`Send ${BURST_SIZE}`)
 
-    expect(new Set(sentBodies().map((tx) => tx.transactionId)).size).toBe(BURST_SIZE)
+    expect(new Set(sentBodies().map((transaction) => transaction.transactionId)).size).toBe(BURST_SIZE)
   })
 
   it('follows up with a final status and later timestamp for the same id', async () => {

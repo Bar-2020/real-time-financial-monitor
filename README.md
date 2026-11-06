@@ -92,12 +92,17 @@ backend/
   FinancialMonitor.Tests/   xUnit tests, including a real SignalR client over WebSockets
   k8s/                      Kubernetes manifests
   Dockerfile
-frontend/
-  src/
-    transaction.ts          types, mock data and the merge rule
-    useTransactions.ts      SignalR connection and batching
-    AddPage.tsx             /add
-    MonitorPage.tsx         /monitor
+frontend/src/
+  api/                      HTTP and SignalR calls to the backend
+  components/               one folder per component, with its CSS and tests
+    AddPage/                /add
+    App/                    navigation and routes
+    MonitorPage/            /monitor
+    TransactionRow/         one row, with its status badge and animations
+  constants/                shared constants
+  hooks/                    useTransactions: connection and batching
+  types/                    shared types
+  utils/                    mock data and the merge rule
 ```
 
 ## Known limits

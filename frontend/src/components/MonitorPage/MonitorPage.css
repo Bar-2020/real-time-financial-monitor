@@ -1,0 +1,82 @@
+.monitor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.monitor-header h1 {
+  margin: 0;
+}
+
+.connection {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pending-text);
+}
+
+.connection-live {
+  color: var(--completed-text);
+}
+
+.monitor-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.monitor-filter {
+  padding: 4px 12px;
+  border-color: var(--border);
+  color: var(--text);
+  background: var(--surface);
+}
+
+.monitor-filter[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: #ffffff;
+  background: var(--accent);
+}
+
+.monitor-table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.monitor-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.monitor-table th,
+.monitor-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.monitor-table th {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+/* The second column holds amounts, whichever component renders the cell. */
+.monitor-table th:nth-child(2),
+.monitor-table td:nth-child(2) {
+  text-align: right;
+}
+
+.monitor-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.monitor-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+}

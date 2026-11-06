@@ -1,11 +1,8 @@
-import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr'
 import { useEffect, useState } from 'react'
-import { mergeTransactions, type Row, type Transaction } from './transaction'
-
-export const FLUSH_INTERVAL_MS = 100
-export const RETRY_DELAY_MS = 3000
-
-export type ConnectionState = 'connecting' | 'live' | 'reconnecting'
+import { createTransactionHub } from '../api/transactions'
+import { FLUSH_INTERVAL_MS, RETRY_DELAY_MS } from '../constants'
+import type { ConnectionState, Row, Transaction } from '../types'
+import { mergeTransactions } from '../utils/transactions'
 
 export function useTransactions() {
   const [rows, setRows] = useState<Row[]>([])
@@ -13,27 +10,22 @@ export function useTransactions() {
 
   useEffect(() => {
     let stopped = false
-    let retry: ReturnType<typeof setTimeout>
+    let retryTimer: ReturnType<typeof setTimeout>
     const buffer: Transaction[] = []
-
-    const hub = new HubConnectionBuilder()
-      // Skipping negotiation means a single request reaches a single pod, so no sticky sessions are needed.
-      .withUrl('/hubs/transactions', { skipNegotiation: true, transport: HttpTransportType.WebSockets })
-      .withAutomaticReconnect({ nextRetryDelayInMilliseconds: () => RETRY_DELAY_MS })
-      .build()
+    const hub = createTransactionHub()
 
     hub.on('snapshot', (snapshot: Transaction[]) =>
-      setRows((current) => mergeTransactions(current, [...snapshot].reverse(), false)),
+      setRows((currentRows) => mergeTransactions(currentRows, [...snapshot].reverse(), false)),
     )
     // Buffered rather than set directly, so a burst of messages costs one render instead of one each.
-    hub.on('transaction', (tx: Transaction) => buffer.push(tx))
+    hub.on('transaction', (transaction: Transaction) => buffer.push(transaction))
     hub.onreconnecting(() => setConnection('reconnecting'))
     hub.onreconnected(() => setConnection('live'))
 
-    const flush = setInterval(() => {
+    const flushTimer = setInterval(() => {
       if (buffer.length === 0) return
       const batch = buffer.splice(0)
-      setRows((current) => mergeTransactions(current, batch, true))
+      setRows((currentRows) => mergeTransactions(currentRows, batch, true))
     }, FLUSH_INTERVAL_MS)
 
     // Automatic reconnect only covers a connection that was once up, so the first start retries itself.
@@ -42,15 +34,15 @@ export function useTransactions() {
         .start()
         .then(() => setConnection('live'))
         .catch(() => {
-          if (!stopped) retry = setTimeout(start, RETRY_DELAY_MS)
+          if (!stopped) retryTimer = setTimeout(start, RETRY_DELAY_MS)
         })
     // Deferred so StrictMode's immediate unmount cancels it, rather than aborting a half-open connection.
-    retry = setTimeout(start)
+    retryTimer = setTimeout(start)
 
     return () => {
       stopped = true
-      clearInterval(flush)
-      clearTimeout(retry)
+      clearInterval(flushTimer)
+      clearTimeout(retryTimer)
       void hub.stop()
     }
   }, [])
