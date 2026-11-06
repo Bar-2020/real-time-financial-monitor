@@ -13,6 +13,8 @@ public class Program
         builder.Services.AddSingleton<TransactionStore>();
         builder.Services.AddSingleton<TransactionProcessor>();
         builder.Services.AddSingleton<IValidator<Transaction>, TransactionValidator>();
+        builder.Services.AddSingleton<RedisSync>();
+        builder.Services.AddHostedService(services => services.GetRequiredService<RedisSync>());
 
         var app = builder.Build();
 
@@ -21,13 +23,15 @@ public class Program
         app.MapPost("/api/transactions", async (
             Transaction tx,
             IValidator<Transaction> validator,
-            TransactionProcessor processor) =>
+            TransactionProcessor processor,
+            RedisSync redisSync) =>
         {
             var validation = validator.Validate(tx);
             if (!validation.IsValid)
                 return Results.ValidationProblem(validation.ToDictionary());
 
             await processor.ApplyAsync(tx);
+            await redisSync.PublishAsync(tx);
             return Results.Accepted();
         });
 
