@@ -1,0 +1,6 @@
+**/bin/
+**/obj/
+FinancialMonitor.Tests/
+k8s/
+Dockerfile
+README.md
