@@ -1,0 +1,107 @@
+# Real-Time Financial Monitor
+
+Accepts transactions over HTTP and pushes them to a live dashboard over WebSockets.
+
+- **Backend:** .NET 8 minimal API, SignalR, FluentValidation, optional Redis Pub/Sub
+- **Frontend:** React, TypeScript and Vite
+
+Running several instances, the Dockerfile and the Kubernetes manifests are covered in [backend/README.md](backend/README.md).
+
+## Run
+
+You need the .NET 8 SDK (or a newer SDK with the .NET 8 runtime) and Node 20+. From the repo root:
+
+```bash
+dotnet run --project backend/FinancialMonitor.Api
+```
+
+This starts the API on port 5080 and Vite on port 5173, using Microsoft's SPA proxy. The first run also installs the frontend packages. Then open <http://localhost:5173>.
+
+| Route | What it does |
+|---|---|
+| `/add` | Simulator. Sends mock transactions as `Pending`, then updates each one to `Completed` or `Failed` about 2 seconds later |
+| `/monitor` | Live dashboard, with status colours and a status filter |
+
+Open each route in its own tab to watch transactions arrive.
+
+## Test
+
+```bash
+dotnet test backend/FinancialMonitor.sln
+```
+
+```bash
+npm --prefix frontend test
+```
+
+Two multi-instance tests need a real Redis and are skipped without one:
+
+```bash
+docker run -d --name redis -p 6379:6379 redis:7-alpine
+```
+
+```bash
+TEST_REDIS=localhost:6379 dotnet test backend/FinancialMonitor.sln
+```
+
+## API
+
+### `POST /api/transactions`
+
+```bash
+curl -i -X POST http://localhost:5080/api/transactions \
+  -H "Content-Type: application/json" \
+  -d '{"transactionId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b","amount":1500.50,"currency":"USD","status":"Pending","timestamp":"2024-01-15T10:00:00Z"}'
+```
+
+Returns `202` if the body is valid, or `400` naming the invalid fields. `status` is `Pending`, `Completed` or `Failed`.
+
+POST is an upsert on `transactionId`. Only a strictly newer `timestamp` changes a row, so duplicates and late arrivals are accepted and ignored.
+
+### WebSocket hub: `/hubs/transactions`
+
+| Server message | When | Payload |
+|---|---|---|
+| `snapshot` | On every connect and reconnect | The latest 100 transactions, newest first |
+| `transaction` | When a row changes | One transaction |
+
+### `GET /health`
+
+Used by the Kubernetes probes.
+
+## How it works
+
+**Consistency.** `TransactionStore` keeps the latest 10,000 transactions in memory behind one lock, because the timestamp check, the write and the eviction must be a single atomic step. The result of that step decides whether to broadcast, so a duplicate never reaches a client.
+
+**Connections.** SignalR handles thread-safe sending to all connected clients. Each client gets a snapshot when it connects, then live updates. It joins the broadcast before reading the snapshot, so nothing falls between the two, and the client's merge handles any overlap.
+
+**Performance.** Incoming messages go into a buffer that flushes into React state every 100ms as one update. The list is capped at 100 rows, rows are memoised, and `Intl` formatters are created once. Measured in headless Edge against the dev server with 100 transactions at once:
+
+| CPU | All on screen | Long tasks | Worst frame |
+|---|---|---|---|
+| Normal | About 210ms | None | 7ms for new rows, 21ms for status changes |
+| 4x slower | About 250–310ms | 58–87ms | About 100–150ms |
+
+**Animation.** New rows fade and slide in using only `opacity` and `transform`, and status badges transition their colours. History loaded on connect doesn't animate, and `prefers-reduced-motion` turns it all off.
+
+## Project structure
+
+```
+backend/
+  FinancialMonitor.Api/     API, hub, store, validation and Redis sync
+  FinancialMonitor.Tests/   xUnit tests, including a real SignalR client over WebSockets
+  k8s/                      Kubernetes manifests
+  Dockerfile
+frontend/
+  src/
+    transaction.ts          types, mock data and the merge rule
+    useTransactions.ts      SignalR connection and batching
+    AddPage.tsx             /add
+    MonitorPage.tsx         /monitor
+```
+
+## Known limits
+
+- History lives in memory, so restarting the backend clears it. The dashboard is a live view, not the permanent record.
+- There's no authentication, so anyone who can reach the API can post to it and read the stream.
+- The frontend expects the API on the same origin, through the Vite proxy in development or an ingress in production, so CORS isn't configured.
