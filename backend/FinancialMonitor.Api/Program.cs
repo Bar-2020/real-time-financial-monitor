@@ -21,17 +21,17 @@ public class Program
         app.MapHealthChecks("/health");
         app.MapHub<TransactionHub>("/hubs/transactions");
         app.MapPost("/api/transactions", async (
-            Transaction tx,
+            Transaction transaction,
             IValidator<Transaction> validator,
             TransactionProcessor processor,
             RedisSync redisSync) =>
         {
-            var validation = validator.Validate(tx);
+            var validation = validator.Validate(transaction);
             if (!validation.IsValid)
                 return Results.ValidationProblem(validation.ToDictionary());
 
-            await processor.ApplyAsync(tx);
-            await redisSync.PublishAsync(tx);
+            await processor.ApplyAsync(transaction);
+            await redisSync.PublishAsync(transaction);
             return Results.Accepted();
         });
 
