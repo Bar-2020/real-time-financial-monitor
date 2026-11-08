@@ -1,7 +1,7 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 
-const backend = 'http://localhost:5080'
+const BACKEND_API_URL = 'http://localhost:5080'
 
 export default defineConfig({
   plugins: [react()],
@@ -9,8 +9,8 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     proxy: {
-      '/api': backend,
-      '/hubs': { target: backend, ws: true },
+      '/api': BACKEND_API_URL,
+      '/hubs': { target: BACKEND_API_URL, ws: true },
     },
   },
   test: {
