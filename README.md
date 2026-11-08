@@ -24,6 +24,26 @@ This starts the API on port 5080 and Vite on port 5173, using Microsoft's SPA pr
 
 Open each route in its own tab to watch transactions arrive.
 
+### Several instances
+
+With Kubernetes enabled in Docker Desktop (Settings, Kubernetes, Enable), one line builds the image and deploys 5 API instances plus Redis. It works in bash and PowerShell:
+
+```bash
+docker build -t financial-monitor-api:latest backend; kubectl --context docker-desktop apply -f backend/k8s
+```
+
+The cluster serves the API on port 5080, the same as `dotnet run`, so the dashboard needs no setup. Stop any local `dotnet run` first, install the frontend packages once, then start the dashboard:
+
+```bash
+npm --prefix frontend ci
+```
+
+```bash
+npm --prefix frontend run dev
+```
+
+Then open <http://localhost:5173/monitor>. Cleanup and details are in [backend/README.md](backend/README.md).
+
 ## Test
 
 ```bash

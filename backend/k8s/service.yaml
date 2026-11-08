@@ -7,5 +7,6 @@ spec:
   selector:
     app: financial-monitor-api
   ports:
-    - port: 80
+    # 5080 is the port of a local `dotnet run`, so the frontend's default proxy reaches the cluster without any setup.
+    - port: 5080
       targetPort: 8080

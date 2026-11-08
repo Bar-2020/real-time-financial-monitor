@@ -87,16 +87,48 @@ The build has two stages: the SDK image compiles, and only the published output 
 
 ## Kubernetes
 
+With Kubernetes enabled in Docker Desktop (Settings, Kubernetes, Enable), build the image and apply the manifests from the repo root. The same line works in bash and PowerShell:
+
 ```bash
-kubectl apply -f backend/k8s
+docker build -t financial-monitor-api:latest backend; kubectl --context docker-desktop apply -f backend/k8s
 ```
+
+`--context docker-desktop` keeps it from touching any other cluster the machine can reach. The `;` doesn't stop after a failed build, so check the build output before trusting the deploy. The pods are ready after about 10 seconds:
+
+```bash
+kubectl --context docker-desktop get pods
+```
+
+The Service listens on port 5080, the same as a local `dotnet run`, so the frontend's default proxy reaches the cluster with no setup. Stop any local `dotnet run` first, because both use port 5080. Install the frontend's packages once, then run the dashboard separately:
+
+```bash
+npm --prefix frontend ci
+```
+
+```bash
+npm --prefix frontend run dev
+```
+
+Then open <http://localhost:5173/monitor>. Remove the deployment with:
+
+```bash
+kubectl --context docker-desktop delete -f backend/k8s
+```
+
+The image tag never changes, so after changing backend code, run the build and apply line again, then restart the pods:
+
+```bash
+kubectl --context docker-desktop rollout restart deployment/financial-monitor-api
+```
+
+If you change the Service port on a running cluster, delete the Service first. Docker Desktop doesn't republish it on the new port otherwise.
 
 | File | What it creates |
 |---|---|
 | `deployment.yaml` | 5 API replicas with `/health` probes and resource limits, non-root with a read-only filesystem |
-| `service.yaml` | A LoadBalancer on port 80 |
+| `service.yaml` | A LoadBalancer on port 5080, the port of a local `dotnet run` |
 | `redis.yaml` | One Redis with persistence off, because it only relays messages |
 
-The manifests pass `kubeconform --strict`, but they haven't been run on a real cluster. The image name has no registry, so push it to one or load it into your cluster first (for example `kind load docker-image financial-monitor-api:latest`).
+The manifests pass `kubeconform --strict` and have run on Docker Desktop's Kubernetes, with a cross-pod update showing up on a dashboard connected through the LoadBalancer. They haven't been run on a cloud cluster. The image name has no registry, so on any other cluster push it to a registry or load it first (for example `kind load docker-image financial-monitor-api:latest`).
 
 The frontend isn't deployed here. In production, serve its build from the same origin as the API, for example through an ingress.
