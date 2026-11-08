@@ -1,7 +1,7 @@
 using FinancialMonitor.Api.Models;
 using FluentValidation;
 
-namespace FinancialMonitor.Api.Validation;
+namespace FinancialMonitor.Api.Validators;
 
 public sealed class TransactionValidator : AbstractValidator<Transaction>
 {

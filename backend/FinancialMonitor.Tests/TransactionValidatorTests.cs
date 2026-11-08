@@ -1,5 +1,5 @@
 using FinancialMonitor.Api.Models;
-using FinancialMonitor.Api.Validation;
+using FinancialMonitor.Api.Validators;
 
 namespace FinancialMonitor.Tests;
 

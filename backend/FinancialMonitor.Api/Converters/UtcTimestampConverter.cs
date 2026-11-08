@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace FinancialMonitor.Api.Json;
+namespace FinancialMonitor.Api.Converters;
 
 public sealed class UtcTimestampConverter : JsonConverter<DateTimeOffset>
 {

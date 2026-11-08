@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using FinancialMonitor.Api.Json;
+using FinancialMonitor.Api.Converters;
 
 namespace FinancialMonitor.Api.Models;
 

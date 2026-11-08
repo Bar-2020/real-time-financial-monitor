@@ -1,7 +1,7 @@
 using FinancialMonitor.Api.Hubs;
 using FinancialMonitor.Api.Models;
 using FinancialMonitor.Api.Services;
-using FinancialMonitor.Api.Validation;
+using FinancialMonitor.Api.Validators;
 using FluentValidation;
 
 namespace FinancialMonitor.Api;
