@@ -42,7 +42,7 @@ public sealed class Program
             var applied = await processor.ApplyAsync(transaction);
             await redisSync.PublishAsync(transaction);
             if (applied && transaction.Status == TransactionStatus.Pending)
-                resolver.Schedule(transaction.TransactionId);
+                resolver.ResolveAfterRandomDelay(transaction.TransactionId);
             return Results.Accepted();
         });
 

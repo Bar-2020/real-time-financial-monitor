@@ -12,7 +12,7 @@ internal sealed class PendingResolver(
     IHostApplicationLifetime lifetime,
     ILogger<PendingResolver> logger)
 {
-    public void Schedule(Guid transactionId)
+    public void ResolveAfterRandomDelay(Guid transactionId)
     {
         var delayMs = Random.Shared.Next(options.Value.MinDelayMs, options.Value.MaxDelayMs + 1);
         _ = ResolveAfterAsync(transactionId, TimeSpan.FromMilliseconds(delayMs));
