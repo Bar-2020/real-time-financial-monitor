@@ -109,7 +109,7 @@ Used by the Kubernetes probes.
 
 **Connections.** SignalR handles thread-safe sending to all connected clients. Each client gets a snapshot when it connects, then live updates. It joins the broadcast before reading the snapshot, so nothing falls between the two, and the client's merge handles any overlap.
 
-**Performance.** Incoming messages go into a buffer that flushes into React state every 100ms as one update. The list is capped at 100 rows, rows are memoised, and `Intl` formatters are created once. Measured in headless Edge against the dev server with 100 transactions at once:
+**Performance.** Incoming messages go into a buffer that flushes into React state every 100ms as one update. The list is capped at 100 rows, rows are memoised, and `Intl` formatters are created once.
 
 **Animation.** New rows fade and slide in using only `opacity` and `transform`, and status badges transition their colours. History loaded on connect doesn't animate, and `prefers-reduced-motion` turns it all off.
 
