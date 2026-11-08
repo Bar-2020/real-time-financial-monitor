@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { postTransaction } from '../../api/transactions'
-import { BURST_SIZE, STATUS_FOLLOW_UP_MS } from '../../constants'
+import { BURST_SIZE, STATUS_FOLLOW_UP_MAX_MS, STATUS_FOLLOW_UP_MIN_MS } from '../../constants'
 import type { Transaction } from '../../types'
 import { createMockTransaction, settleTransaction } from '../../utils/transactions'
 import './AddPage.css'
@@ -26,7 +26,9 @@ export function AddPage() {
     const transaction = createMockTransaction()
     if (await post(transaction)) {
       // Not cancelled on unmount, so you can send, switch to /monitor and watch the status change.
-      setTimeout(() => void post(settleTransaction(transaction)), STATUS_FOLLOW_UP_MS)
+      const followUpDelay =
+        STATUS_FOLLOW_UP_MIN_MS + Math.random() * (STATUS_FOLLOW_UP_MAX_MS - STATUS_FOLLOW_UP_MIN_MS)
+      setTimeout(() => void post(settleTransaction(transaction)), followUpDelay)
     }
   }
 
@@ -40,7 +42,7 @@ export function AddPage() {
       <h1>Transaction Simulator</h1>
       <p>
         Sends mock transactions as <code>Pending</code>, then updates each one to <code>Completed</code> or{' '}
-        <code>Failed</code> about {STATUS_FOLLOW_UP_MS / 1000} seconds later.
+        <code>Failed</code> {STATUS_FOLLOW_UP_MIN_MS / 1000} to {STATUS_FOLLOW_UP_MAX_MS / 1000} seconds later.
       </p>
       <div className="add-page-actions">
         <button type="button" onClick={() => send(1)}>

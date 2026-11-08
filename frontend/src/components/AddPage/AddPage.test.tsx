@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { BURST_SIZE, STATUS_FOLLOW_UP_MS } from '../../constants'
+import { BURST_SIZE, STATUS_FOLLOW_UP_MAX_MS, STATUS_FOLLOW_UP_MIN_MS } from '../../constants'
 import type { Transaction } from '../../types'
 import { AddPage } from './AddPage'
 
@@ -54,13 +54,13 @@ describe('AddPage', () => {
     expect(new Set(sentBodies().map((transaction) => transaction.transactionId)).size).toBe(BURST_SIZE)
   })
 
-  it('follows up with a final status and later timestamp for the same id', async () => {
+  it('follows up 5 to 20 seconds later with a final status and later timestamp for the same id', async () => {
     render(<AddPage />)
     await click('Send 1')
-    await advance(STATUS_FOLLOW_UP_MS - 1)
+    await advance(STATUS_FOLLOW_UP_MIN_MS - 1)
     expect(fetchMock).toHaveBeenCalledOnce()
 
-    await advance(1)
+    await advance(STATUS_FOLLOW_UP_MAX_MS - STATUS_FOLLOW_UP_MIN_MS + 1)
 
     expect(fetchMock).toHaveBeenCalledTimes(2)
     const [pending, settled] = sentBodies()
@@ -74,7 +74,7 @@ describe('AddPage', () => {
     await click('Send 1')
 
     unmount()
-    await advance(STATUS_FOLLOW_UP_MS)
+    await advance(STATUS_FOLLOW_UP_MAX_MS)
 
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
@@ -102,7 +102,7 @@ describe('AddPage', () => {
     render(<AddPage />)
 
     await click('Send 1')
-    await advance(STATUS_FOLLOW_UP_MS)
+    await advance(STATUS_FOLLOW_UP_MAX_MS)
 
     expect(fetchMock).toHaveBeenCalledOnce()
   })

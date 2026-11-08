@@ -19,7 +19,7 @@ This starts the API on port 5080 and Vite on port 5173, using Microsoft's SPA pr
 
 | Route | What it does |
 |---|---|
-| `/add` | Simulator. Sends mock transactions as `Pending`, then updates each one to `Completed` or `Failed` about 2 seconds later |
+| `/add` | Simulator. Sends mock transactions as `Pending`, then updates each one to `Completed` or `Failed` 5 to 20 seconds later |
 | `/monitor` | Live dashboard, with status colours and a status filter |
 
 Open each route in its own tab to watch transactions arrive.
