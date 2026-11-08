@@ -4,9 +4,9 @@ namespace FinancialMonitor.Api;
 
 public sealed class TransactionProcessor(TransactionStore store, IHubContext<TransactionHub> hub)
 {
-    public async Task ApplyAsync(Transaction tx)
+    public async Task ApplyAsync(Transaction transaction)
     {
-        if (store.Upsert(tx))
-            await hub.Clients.All.SendAsync(TransactionHub.TransactionMethod, tx);
+        if (store.Upsert(transaction))
+            await hub.Clients.All.SendAsync(TransactionHub.TransactionMethod, transaction);
     }
 }

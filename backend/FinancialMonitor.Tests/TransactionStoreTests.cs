@@ -9,10 +9,10 @@ public class TransactionStoreTests
     [Fact]
     public void A_new_transaction_is_stored()
     {
-        var tx = TestData.Tx();
+        var transaction = TestData.Tx();
 
-        Assert.True(_store.Upsert(tx));
-        Assert.Equal(tx, Assert.Single(_store.GetLatest(10)));
+        Assert.True(_store.Upsert(transaction));
+        Assert.Equal(transaction, Assert.Single(_store.GetLatest(10)));
     }
 
     [Fact]
@@ -53,10 +53,10 @@ public class TransactionStoreTests
     [Fact]
     public void An_identical_redelivery_is_ignored()
     {
-        var tx = TestData.Tx();
-        _store.Upsert(tx);
+        var transaction = TestData.Tx();
+        _store.Upsert(transaction);
 
-        Assert.False(_store.Upsert(tx));
+        Assert.False(_store.Upsert(transaction));
     }
 
     [Fact]

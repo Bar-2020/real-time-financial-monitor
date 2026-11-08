@@ -30,13 +30,13 @@ public sealed class TransactionApiTests : IDisposable
     public async Task A_valid_post_is_accepted_and_broadcast()
     {
         await using var client = await TestClient.ConnectAsync(Server);
-        var tx = TestData.Tx();
+        var transaction = TestData.Tx();
 
-        var response = await _http.PostAsJsonAsync(Url, tx);
+        var response = await _http.PostAsJsonAsync(Url, transaction);
         await client.WaitForAsync(1);
 
         Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
-        Assert.Equal(tx, Assert.Single(client.Received));
+        Assert.Equal(transaction, Assert.Single(client.Received));
     }
 
     [Theory]
@@ -108,7 +108,7 @@ public sealed class TransactionApiTests : IDisposable
 
         Assert.Equal(
             [TransactionStatus.Pending, TransactionStatus.Failed],
-            client.Received.Select(tx => tx.Status));
+            client.Received.Select(transaction => transaction.Status));
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public sealed class TransactionApiTests : IDisposable
         Assert.All(clients, client =>
         {
             Assert.Equal(postCount + 1, client.Received.Count);
-            Assert.Equal(postCount + 1, client.Received.Select(tx => tx.TransactionId).Distinct().Count());
+            Assert.Equal(postCount + 1, client.Received.Select(transaction => transaction.TransactionId).Distinct().Count());
         });
 
         foreach (var client in clients)

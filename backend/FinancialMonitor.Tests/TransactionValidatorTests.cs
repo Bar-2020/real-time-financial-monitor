@@ -6,9 +6,9 @@ public class TransactionValidatorTests
 {
     private readonly TransactionValidator _validator = new();
 
-    private void AssertRejected(Transaction tx, string property)
+    private void AssertRejected(Transaction transaction, string property)
     {
-        var result = _validator.Validate(tx);
+        var result = _validator.Validate(transaction);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == property);

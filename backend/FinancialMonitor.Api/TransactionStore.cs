@@ -11,21 +11,21 @@ public sealed class TransactionStore
     private readonly Queue<Guid> _arrivalOrder = new();
 
     /// <returns>True if the row changed, false if the transaction was a duplicate or out of date.</returns>
-    public bool Upsert(Transaction tx)
+    public bool Upsert(Transaction transaction)
     {
         lock (_gate)
         {
-            if (_byId.TryGetValue(tx.TransactionId, out var existing))
+            if (_byId.TryGetValue(transaction.TransactionId, out var existing))
             {
-                if (tx.Timestamp <= existing.Timestamp) return false;
+                if (transaction.Timestamp <= existing.Timestamp) return false;
             }
             else
             {
-                _arrivalOrder.Enqueue(tx.TransactionId);
+                _arrivalOrder.Enqueue(transaction.TransactionId);
                 if (_arrivalOrder.Count > Capacity) _byId.Remove(_arrivalOrder.Dequeue());
             }
 
-            _byId[tx.TransactionId] = tx;
+            _byId[transaction.TransactionId] = transaction;
             return true;
         }
     }

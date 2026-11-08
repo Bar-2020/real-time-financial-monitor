@@ -86,13 +86,13 @@ public sealed class RedisSyncTests
     {
         await using var pod = Instance("localhost:1");
         var http = pod.CreateClient();
-        var tx = TestData.Tx();
+        var transaction = TestData.Tx();
         var timer = Stopwatch.StartNew();
 
-        var response = await http.PostAsJsonAsync(Url, tx);
+        var response = await http.PostAsJsonAsync(Url, transaction);
 
         Assert.True(timer.Elapsed < TimeSpan.FromSeconds(3), "A POST must not wait on Redis.");
         Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
-        Assert.Contains(tx, pod.Services.GetRequiredService<TransactionStore>().GetLatest(10));
+        Assert.Contains(transaction, pod.Services.GetRequiredService<TransactionStore>().GetLatest(10));
     }
 }

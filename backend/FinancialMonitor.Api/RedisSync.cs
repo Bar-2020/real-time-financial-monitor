@@ -33,18 +33,18 @@ public sealed class RedisSync(
         await _redis.GetSubscriber().SubscribeAsync(Channel, OnMessage, CommandFlags.FireAndForget);
     }
 
-    public async Task PublishAsync(Transaction tx)
+    public async Task PublishAsync(Transaction transaction)
     {
         if (_redis is null) return;
 
         try
         {
-            await _redis.GetSubscriber().PublishAsync(Channel, JsonSerializer.Serialize(tx, Json));
+            await _redis.GetSubscriber().PublishAsync(Channel, JsonSerializer.Serialize(transaction, Json));
         }
         catch (Exception e) when (e is RedisException or TimeoutException)
         {
             // shortcut: other instances never get this transaction, use Redis Streams or Kafka if they must catch up.
-            logger.LogError(e, "Could not publish transaction {TransactionId}", tx.TransactionId);
+            logger.LogError(e, "Could not publish transaction {TransactionId}", transaction.TransactionId);
         }
     }
 
