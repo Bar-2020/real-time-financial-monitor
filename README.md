@@ -94,7 +94,7 @@ POST is an upsert on `transactionId`. Only a strictly newer `timestamp` changes 
 
 | Server message | When | Payload |
 |---|---|---|
-| `snapshot` | On every connect and reconnect | The latest 100 transactions, newest first |
+| `snapshot` | On every connect and reconnect | The latest 100 transactions, newest first (`Hub:SnapshotSize`) |
 | `transaction` | When a row changes | One transaction |
 
 ### `GET /health`

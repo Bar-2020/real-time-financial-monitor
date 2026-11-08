@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json;
 using FinancialMonitor.Api.Models;
 using FinancialMonitor.Api.Services;
-using FinancialMonitor.Api.Hubs;
 using FinancialMonitor.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -16,12 +15,14 @@ namespace FinancialMonitor.Tests;
 public sealed class TransactionApiTests : IDisposable
 {
     private const string Url = "/api/transactions";
+    private const int SnapshotSize = 5;
 
     // Pending posts here must stay Pending, so push the resolution out of the tests' reach.
     private readonly WebApplicationFactory<Program> _app = new WebApplicationFactory<Program>().WithWebHostBuilder(host =>
     {
         host.UseSetting("PendingResolution:MinDelayMs", "3600000");
         host.UseSetting("PendingResolution:MaxDelayMs", "3600000");
+        host.UseSetting("Hub:SnapshotSize", SnapshotSize.ToString());
     });
     private readonly HttpClient _http;
 
@@ -96,14 +97,14 @@ public sealed class TransactionApiTests : IDisposable
     public async Task The_snapshot_is_limited_to_the_snapshot_size()
     {
         var store = _app.Services.GetRequiredService<TransactionStore>();
-        for (var i = 0; i <= TransactionHub.SnapshotSize; i++)
+        for (var i = 0; i <= SnapshotSize; i++)
             store.Upsert(TestData.Tx(secondsLater: i));
 
         await using var client = await TestClient.ConnectAsync(Server);
 
         var snapshot = await client.Snapshot;
-        Assert.Equal(TransactionHub.SnapshotSize, snapshot.Length);
-        Assert.Equal(TestData.BaseTime.AddSeconds(TransactionHub.SnapshotSize), snapshot[0].Timestamp);
+        Assert.Equal(SnapshotSize, snapshot.Length);
+        Assert.Equal(TestData.BaseTime.AddSeconds(SnapshotSize), snapshot[0].Timestamp);
     }
 
     [Fact]

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace FinancialMonitor.Api.Converters;
 
-public sealed class UtcTimestampConverter : JsonConverter<DateTimeOffset>
+internal sealed class UtcTimestampConverter : JsonConverter<DateTimeOffset>
 {
     public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
         reader.GetDateTimeOffset();

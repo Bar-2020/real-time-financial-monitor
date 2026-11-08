@@ -1,20 +1,21 @@
 using FinancialMonitor.Api.Models;
+using FinancialMonitor.Api.Options;
+using Microsoft.Extensions.Options;
 
 namespace FinancialMonitor.Api.Services;
 
-public sealed class PendingResolver(
+internal sealed class PendingResolver(
     TransactionStore store,
     TransactionProcessor processor,
     RedisSync redisSync,
-    IConfiguration configuration,
+    IOptions<PendingResolutionOptions> options,
     IHostApplicationLifetime lifetime,
     ILogger<PendingResolver> logger)
 {
     public void Schedule(Guid transactionId)
     {
-        var min = configuration.GetValue<int>("PendingResolution:MinDelayMs");
-        var max = configuration.GetValue<int>("PendingResolution:MaxDelayMs");
-        _ = ResolveAfterAsync(transactionId, TimeSpan.FromMilliseconds(Random.Shared.Next(min, max + 1)));
+        var delayMs = Random.Shared.Next(options.Value.MinDelayMs, options.Value.MaxDelayMs + 1);
+        _ = ResolveAfterAsync(transactionId, TimeSpan.FromMilliseconds(delayMs));
     }
 
     public async Task ResolveAsync(Guid transactionId, double randomValue)
@@ -23,7 +24,7 @@ public sealed class PendingResolver(
 
         var resolved = storedTransaction with
         {
-            Status = randomValue < configuration.GetValue<double>("PendingResolution:FailureRate")
+            Status = randomValue < options.Value.FailureRate
                 ? TransactionStatus.Failed
                 : TransactionStatus.Completed,
             Timestamp = DateTimeOffset.UtcNow,

@@ -1,16 +1,22 @@
 using FinancialMonitor.Api.Hubs;
 using FinancialMonitor.Api.Models;
+using FinancialMonitor.Api.Options;
 using FinancialMonitor.Api.Services;
 using FinancialMonitor.Api.Validators;
 
 namespace FinancialMonitor.Api;
 
-public class Program
+public sealed class Program
 {
-    public static void Main(string[] args)
+    private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // Validated at startup, so a bad value stops the app instead of quietly changing its behaviour.
+        builder.Services.AddOptions<TransactionHubOptions>()
+            .BindConfiguration("Hub").ValidateDataAnnotations().ValidateOnStart();
+        builder.Services.AddOptions<PendingResolutionOptions>()
+            .BindConfiguration("PendingResolution").ValidateDataAnnotations().ValidateOnStart();
         builder.Services.AddSignalR();
         builder.Services.AddHealthChecks();
         builder.Services.AddSingleton<TransactionStore>();

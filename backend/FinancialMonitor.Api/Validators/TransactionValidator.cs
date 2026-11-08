@@ -3,7 +3,7 @@ using FinancialMonitor.Api.Models;
 
 namespace FinancialMonitor.Api.Validators;
 
-public static class TransactionValidator
+internal static class TransactionValidator
 {
     /// <returns>The invalid fields by JSON name, empty if the transaction is valid.</returns>
     public static Dictionary<string, string[]> Validate(Transaction transaction)

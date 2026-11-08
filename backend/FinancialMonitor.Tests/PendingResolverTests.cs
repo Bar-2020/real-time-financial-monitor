@@ -38,9 +38,10 @@ public sealed class PendingResolverTests : IDisposable
     }
 
     [Theory]
-    [InlineData(0.5, TransactionStatus.Completed)]
-    [InlineData(0.1, TransactionStatus.Failed)]
-    public async Task The_random_value_decides_between_completed_and_failed(double randomValue, TransactionStatus expected)
+    [InlineData(0.5, "Completed")]
+    [InlineData(0.1, "Failed")]
+    // The status is a string because a public test method cannot take the internal TransactionStatus.
+    public async Task The_random_value_decides_between_completed_and_failed(double randomValue, string expected)
     {
         var pending = TestData.Tx();
         Store.Upsert(pending);
@@ -48,7 +49,7 @@ public sealed class PendingResolverTests : IDisposable
         await Resolver.ResolveAsync(pending.TransactionId, randomValue);
 
         Assert.True(Store.TryGet(pending.TransactionId, out var stored));
-        Assert.Equal(expected, stored.Status);
+        Assert.Equal(expected, stored.Status.ToString());
     }
 
     [Fact]

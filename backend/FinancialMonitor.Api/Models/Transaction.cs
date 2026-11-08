@@ -3,7 +3,7 @@ using FinancialMonitor.Api.Converters;
 
 namespace FinancialMonitor.Api.Models;
 
-public sealed record Transaction
+internal sealed record Transaction
 {
     public Guid TransactionId { get; init; }
     public decimal Amount { get; init; }

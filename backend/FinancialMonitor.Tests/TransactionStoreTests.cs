@@ -3,7 +3,7 @@ using FinancialMonitor.Api.Services;
 
 namespace FinancialMonitor.Tests;
 
-public class TransactionStoreTests
+public sealed class TransactionStoreTests
 {
     private readonly TransactionStore _store = new();
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace FinancialMonitor.Api.Services;
 
-public sealed class TransactionProcessor(TransactionStore store, IHubContext<TransactionHub> hub)
+internal sealed class TransactionProcessor(TransactionStore store, IHubContext<TransactionHub> hub)
 {
     public async Task<bool> ApplyAsync(Transaction transaction)
     {

@@ -3,7 +3,7 @@ using FinancialMonitor.Api.Models;
 
 namespace FinancialMonitor.Tests;
 
-public class TransactionJsonTests
+public sealed class TransactionJsonTests
 {
     private static readonly JsonSerializerOptions Web = new(JsonSerializerDefaults.Web);
 

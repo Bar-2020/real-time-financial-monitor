@@ -3,7 +3,7 @@ using FinancialMonitor.Api.Validators;
 
 namespace FinancialMonitor.Tests;
 
-public class TransactionValidatorTests
+public sealed class TransactionValidatorTests
 {
     private static void AssertRejected(Transaction transaction, string field) =>
         Assert.True(TransactionValidator.Validate(transaction).ContainsKey(field));

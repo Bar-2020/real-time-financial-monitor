@@ -8,7 +8,7 @@ namespace FinancialMonitor.Api.Services;
 /// Keeps every instance's store and clients in step over Redis Pub/Sub.
 /// Does nothing when no Redis address is configured, so a single instance needs no Redis.
 /// </summary>
-public sealed class RedisSync(
+internal sealed class RedisSync(
     IConfiguration configuration,
     TransactionProcessor processor,
     ILogger<RedisSync> logger) : IHostedService

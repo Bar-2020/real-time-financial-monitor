@@ -1,7 +1,7 @@
 using FinancialMonitor.Api.Models;
 namespace FinancialMonitor.Api.Services;
 
-public sealed class TransactionStore
+internal sealed class TransactionStore
 {
     public const int Capacity = 10_000;
 
