@@ -2,7 +2,7 @@
 
 Accepts transactions over HTTP and pushes them to a live dashboard over WebSockets.
 
-- **Backend:** .NET 8 minimal API, SignalR, FluentValidation, optional Redis Pub/Sub
+- **Backend:** .NET 8 minimal API, SignalR, optional Redis Pub/Sub
 - **Frontend:** React, TypeScript and Vite
 
 Running several instances, the Dockerfile and the Kubernetes manifests are covered in [backend/README.md](backend/README.md).
@@ -12,10 +12,22 @@ Running several instances, the Dockerfile and the Kubernetes manifests are cover
 You need the .NET 8 SDK (or a newer SDK with the .NET 8 runtime) and Node 20+. From the repo root:
 
 ```bash
+npm --prefix frontend ci
+```
+
+Run the backend from Visual Studio (open `backend/FinancialMonitor.sln` and start `FinancialMonitor.Api` with the `http` profile) or from the CLI:
+
+```bash
 dotnet run --project backend/FinancialMonitor.Api
 ```
 
-This starts the API on port 5080 and Vite on port 5173, using Microsoft's SPA proxy. The first run also installs the frontend packages. Then open <http://localhost:5173>.
+Start the dashboard in a separate terminal:
+
+```bash
+npm --prefix frontend run dev
+```
+
+The API listens on port 5080 and Vite on port 5173. Open <http://localhost:5173>.
 
 | Route | What it does |
 |---|---|

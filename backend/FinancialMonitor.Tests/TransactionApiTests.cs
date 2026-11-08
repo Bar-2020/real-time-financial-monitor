@@ -46,6 +46,7 @@ public sealed class TransactionApiTests : IDisposable
     [InlineData("""{"amount":1.5,"currency":"USD","status":"Pending","timestamp":"2024-01-15T10:00:00Z"}""")]
     [InlineData("""{"transactionId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b","currency":"USD","status":"Pending","timestamp":"2024-01-15T10:00:00Z"}""")]
     [InlineData("""{"transactionId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b","amount":1.5,"status":"Pending","timestamp":"2024-01-15T10:00:00Z"}""")]
+    [InlineData("""{"transactionId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b","amount":1.5,"currency":null,"status":"Pending","timestamp":"2024-01-15T10:00:00Z"}""")]
     [InlineData("""{"transactionId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b","amount":1.5,"currency":"USD","timestamp":"2024-01-15T10:00:00Z"}""")]
     [InlineData("""{"transactionId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b","amount":1.5,"currency":"USD","status":"Pending"}""")]
     [InlineData("""{"transactionId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b","amount":1.5,"currency":"USD","status":"Done","timestamp":"2024-01-15T10:00:00Z"}""")]
@@ -69,7 +70,7 @@ public sealed class TransactionApiTests : IDisposable
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.True(problem.GetProperty("errors").TryGetProperty(nameof(Transaction.Amount), out _));
+        Assert.True(problem.GetProperty("errors").TryGetProperty("amount", out _));
     }
 
     [Fact]
