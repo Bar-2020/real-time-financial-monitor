@@ -28,7 +28,7 @@ sequenceDiagram
     B->>B: Nothing newer, so nothing happens
 ```
 
-The code is one class, [`RedisSync`](FinancialMonitor.Api/RedisSync.cs). It's off unless `ConnectionStrings:Redis` is set, so a single instance needs no Redis.
+The code is one class, [`RedisSync`](FinancialMonitor.Api/Services/RedisSync.cs). It's off unless `ConnectionStrings:Redis` is set, so a single instance needs no Redis.
 
 **Why the pods agree.** The same rule handles everything: only a strictly newer `timestamp` changes a row. Hearing your own message is a no-op, so there's no need to track which pod sent what. Updates that reach pods in different orders still end on the same status.
 

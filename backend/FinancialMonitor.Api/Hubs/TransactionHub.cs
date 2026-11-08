@@ -1,6 +1,7 @@
+using FinancialMonitor.Api.Services;
 using Microsoft.AspNetCore.SignalR;
 
-namespace FinancialMonitor.Api;
+namespace FinancialMonitor.Api.Hubs;
 
 public sealed class TransactionHub(TransactionStore store) : Hub
 {

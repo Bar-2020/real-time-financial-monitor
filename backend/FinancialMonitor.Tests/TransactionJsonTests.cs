@@ -1,5 +1,5 @@
 using System.Text.Json;
-using FinancialMonitor.Api;
+using FinancialMonitor.Api.Models;
 
 namespace FinancialMonitor.Tests;
 

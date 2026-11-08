@@ -108,7 +108,12 @@ Used by the Kubernetes probes.
 
 ```
 backend/
-  FinancialMonitor.Api/     API, hub, store, validation and Redis sync
+  FinancialMonitor.Api/
+    Models/                 Transaction and its status
+    Json/                   JSON converters
+    Validation/             request validation
+    Hubs/                   SignalR hub
+    Services/               store, processor and Redis sync
   FinancialMonitor.Tests/   xUnit tests, including a real SignalR client over WebSockets
   k8s/                      Kubernetes manifests
   Dockerfile

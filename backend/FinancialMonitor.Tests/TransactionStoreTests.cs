@@ -1,4 +1,5 @@
-using FinancialMonitor.Api;
+using FinancialMonitor.Api.Models;
+using FinancialMonitor.Api.Services;
 
 namespace FinancialMonitor.Tests;
 

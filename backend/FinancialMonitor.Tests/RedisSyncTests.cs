@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
+using FinancialMonitor.Api.Models;
+using FinancialMonitor.Api.Services;
 using FinancialMonitor.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;

@@ -1,4 +1,5 @@
-namespace FinancialMonitor.Api;
+using FinancialMonitor.Api.Models;
+namespace FinancialMonitor.Api.Services;
 
 public sealed class TransactionStore
 {

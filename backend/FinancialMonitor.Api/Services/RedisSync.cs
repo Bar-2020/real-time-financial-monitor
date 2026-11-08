@@ -1,7 +1,8 @@
+using FinancialMonitor.Api.Models;
 using System.Text.Json;
 using StackExchange.Redis;
 
-namespace FinancialMonitor.Api;
+namespace FinancialMonitor.Api.Services;
 
 /// <summary>
 /// Keeps every instance's store and clients in step over Redis Pub/Sub.
