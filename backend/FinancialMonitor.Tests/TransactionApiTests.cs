@@ -6,6 +6,7 @@ using FinancialMonitor.Api.Models;
 using FinancialMonitor.Api.Services;
 using FinancialMonitor.Api.Hubs;
 using FinancialMonitor.Api;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,12 @@ public sealed class TransactionApiTests : IDisposable
 {
     private const string Url = "/api/transactions";
 
-    private readonly WebApplicationFactory<Program> _app = new();
+    // Pending posts here must stay Pending, so push the resolution out of the tests' reach.
+    private readonly WebApplicationFactory<Program> _app = new WebApplicationFactory<Program>().WithWebHostBuilder(host =>
+    {
+        host.UseSetting("PendingResolution:MinDelayMs", "3600000");
+        host.UseSetting("PendingResolution:MaxDelayMs", "3600000");
+    });
     private readonly HttpClient _http;
 
     public TransactionApiTests() => _http = _app.CreateClient();

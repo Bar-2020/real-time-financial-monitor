@@ -2,7 +2,6 @@ import { MAX_ROWS } from '../constants'
 import type { DisplayedTransaction, Transaction } from '../types'
 
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'ILS']
-const FAILURE_RATE = 0.2
 
 export function createMockTransaction(): Transaction {
   return {
@@ -10,14 +9,6 @@ export function createMockTransaction(): Transaction {
     amount: Number((Math.random() * 10_000 + 1).toFixed(2)),
     currency: CURRENCIES[Math.floor(Math.random() * CURRENCIES.length)],
     status: 'Pending',
-    timestamp: new Date().toISOString(),
-  }
-}
-
-export function settleTransaction(transaction: Transaction, randomValue = Math.random()): Transaction {
-  return {
-    ...transaction,
-    status: randomValue < 1 - FAILURE_RATE ? 'Completed' : 'Failed',
     timestamp: new Date().toISOString(),
   }
 }

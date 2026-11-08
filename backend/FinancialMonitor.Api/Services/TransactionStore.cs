@@ -31,6 +31,14 @@ public sealed class TransactionStore
         }
     }
 
+    public bool TryGet(Guid transactionId, out Transaction transaction)
+    {
+        lock (_gate)
+        {
+            return _byId.TryGetValue(transactionId, out transaction!);
+        }
+    }
+
     public IReadOnlyList<Transaction> GetLatest(int limit)
     {
         lock (_gate)

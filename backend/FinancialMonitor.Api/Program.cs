@@ -15,6 +15,7 @@ public class Program
         builder.Services.AddHealthChecks();
         builder.Services.AddSingleton<TransactionStore>();
         builder.Services.AddSingleton<TransactionProcessor>();
+        builder.Services.AddSingleton<PendingResolver>();
         builder.Services.AddSingleton<RedisSync>();
         builder.Services.AddHostedService(services => services.GetRequiredService<RedisSync>());
 
@@ -25,14 +26,17 @@ public class Program
         app.MapPost("/api/transactions", async (
             Transaction transaction,
             TransactionProcessor processor,
-            RedisSync redisSync) =>
+            RedisSync redisSync,
+            PendingResolver resolver) =>
         {
             var errors = TransactionValidator.Validate(transaction);
             if (errors.Count > 0)
                 return Results.ValidationProblem(errors);
 
-            await processor.ApplyAsync(transaction);
+            var applied = await processor.ApplyAsync(transaction);
             await redisSync.PublishAsync(transaction);
+            if (applied && transaction.Status == TransactionStatus.Pending)
+                resolver.Schedule(transaction.TransactionId);
             return Results.Accepted();
         });
 

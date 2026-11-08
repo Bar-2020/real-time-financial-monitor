@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { MAX_ROWS } from '../constants'
 import type { DisplayedTransaction, Transaction } from '../types'
-import { createMockTransaction, mergeTransactions, settleTransaction } from './transactions'
+import { createMockTransaction, mergeTransactions } from './transactions'
 
 const makeTransaction = (id: string, status: Transaction['status'] = 'Pending', second = 0): Transaction => ({
   transactionId: id,
@@ -26,26 +26,6 @@ describe('createMockTransaction', () => {
 
   it('creates a different id each time', () => {
     expect(createMockTransaction().transactionId).not.toBe(createMockTransaction().transactionId)
-  })
-})
-
-describe('settleTransaction', () => {
-  const pending = makeTransaction('a')
-
-  it('keeps everything except the status and timestamp', () => {
-    const settled = settleTransaction(pending)
-
-    expect(settled).toMatchObject({
-      transactionId: pending.transactionId,
-      amount: pending.amount,
-      currency: pending.currency,
-    })
-    expect(Date.parse(settled.timestamp)).toBeGreaterThan(Date.parse(pending.timestamp))
-  })
-
-  it('usually completes and sometimes fails', () => {
-    expect(settleTransaction(pending, 0.5).status).toBe('Completed')
-    expect(settleTransaction(pending, 0.9).status).toBe('Failed')
   })
 })
 

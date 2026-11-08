@@ -31,7 +31,7 @@ The API listens on port 5080 and Vite on port 5173. Open <http://localhost:5173>
 
 | Route | What it does |
 |---|---|
-| `/add` | Simulator. Sends mock transactions as `Pending`, then updates each one to `Completed` or `Failed` 5 to 20 seconds later |
+| `/add` | Simulator. Sends mock transactions as `Pending`. The backend resolves each one to `Completed` or `Failed` 5 to 20 seconds later |
 | `/monitor` | Live dashboard, with status colours and a status filter |
 
 Open each route in its own tab to watch transactions arrive.
@@ -104,6 +104,8 @@ Used by the Kubernetes probes.
 ## How it works
 
 **Consistency.** `TransactionStore` keeps the latest 10,000 transactions in memory behind one lock, because the timestamp check, the write and the eviction must be a single atomic step. The result of that step decides whether to broadcast, so a duplicate never reaches a client.
+
+**Resolution.** The backend settles every `Pending` transaction it accepts, 20% as `Failed` and the rest as `Completed`, after a random delay. The failure rate and the delay range are the `PendingResolution` section of `appsettings.json`. Only the instance that took the POST does it, and the others get the result over Redis, so a transaction is never resolved twice. A transaction that already has a final status by then is left alone. A `Pending` row stays `Pending` if its instance stops before the delay ends.
 
 **Connections.** SignalR handles thread-safe sending to all connected clients. Each client gets a snapshot when it connects, then live updates. It joins the broadcast before reading the snapshot, so nothing falls between the two, and the client's merge handles any overlap.
 

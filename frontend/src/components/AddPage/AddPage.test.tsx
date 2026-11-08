@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { BURST_SIZE, STATUS_FOLLOW_UP_MAX_MS, STATUS_FOLLOW_UP_MIN_MS } from '../../constants'
+import { BURST_SIZE } from '../../constants'
 import type { Transaction } from '../../types'
 import { AddPage } from './AddPage'
 
@@ -54,29 +54,13 @@ describe('AddPage', () => {
     expect(new Set(sentBodies().map((transaction) => transaction.transactionId)).size).toBe(BURST_SIZE)
   })
 
-  it('follows up 5 to 20 seconds later with a final status and later timestamp for the same id', async () => {
+  it('leaves the final status to the backend, so it never posts a second time', async () => {
     render(<AddPage />)
     await click('Send 1')
-    await advance(STATUS_FOLLOW_UP_MIN_MS - 1)
+
+    await advance(60_000)
+
     expect(fetchMock).toHaveBeenCalledOnce()
-
-    await advance(STATUS_FOLLOW_UP_MAX_MS - STATUS_FOLLOW_UP_MIN_MS + 1)
-
-    expect(fetchMock).toHaveBeenCalledTimes(2)
-    const [pending, settled] = sentBodies()
-    expect(settled.transactionId).toBe(pending.transactionId)
-    expect(['Completed', 'Failed']).toContain(settled.status)
-    expect(Date.parse(settled.timestamp)).toBeGreaterThan(Date.parse(pending.timestamp))
-  })
-
-  it('still sends the follow-up after leaving the page', async () => {
-    const { unmount } = render(<AddPage />)
-    await click('Send 1')
-
-    unmount()
-    await advance(STATUS_FOLLOW_UP_MAX_MS)
-
-    expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
   it('counts accepted posts', async () => {
@@ -95,16 +79,6 @@ describe('AddPage', () => {
 
     expect(screen.getByRole('alert').textContent).toContain('400')
     expect(screen.getByRole('status').textContent).toMatch(/accepted: 0\b.*failed: 1\b/i)
-  })
-
-  it('does not follow up on a transaction that was rejected', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 400 }))
-    render(<AddPage />)
-
-    await click('Send 1')
-    await advance(STATUS_FOLLOW_UP_MAX_MS)
-
-    expect(fetchMock).toHaveBeenCalledOnce()
   })
 
   it('shows an error when the API cannot be reached', async () => {

@@ -1,4 +1,4 @@
-import { BURST_SIZE, STATUS_FOLLOW_UP_MAX_MS, STATUS_FOLLOW_UP_MIN_MS } from '../../constants'
+import { BURST_SIZE } from '../../constants'
 import { useTransactionSimulator } from '../../hooks/useTransactionSimulator'
 import './AddPage.css'
 
@@ -9,8 +9,8 @@ export function AddPage() {
     <section>
       <h1>Transaction Simulator</h1>
       <p>
-        Sends mock transactions as <code>Pending</code>, then updates each one to <code>Completed</code> or{' '}
-        <code>Failed</code> {STATUS_FOLLOW_UP_MIN_MS / 1000} to {STATUS_FOLLOW_UP_MAX_MS / 1000} seconds later.
+        Sends mock transactions as <code>Pending</code>. The backend resolves each one to <code>Completed</code> or{' '}
+        <code>Failed</code> a few seconds later.
       </p>
       <div className="add-page-actions">
         <button type="button" onClick={() => sendMockTransactions(1)}>
