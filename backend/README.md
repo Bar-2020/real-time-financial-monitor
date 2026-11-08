@@ -10,24 +10,6 @@ With 5 replicas behind a load balancer, each request lands on one pod. An agent'
 
 Every pod connects to Redis. Whichever pod receives a POST applies it locally, then publishes it. Every pod hears the message, saves it to its own store and sends it to its own clients.
 
-```mermaid
-sequenceDiagram
-    participant Sim as Simulator
-    participant B as Pod B
-    participant R as Redis
-    participant A as Pod A
-    participant Dash as Browser on Pod A
-
-    Sim->>B: POST /api/transactions
-    B->>B: Save, send to its own browsers
-    B->>R: PUBLISH
-    R->>A: Message
-    A->>A: Save
-    A->>Dash: transaction
-    R->>B: Message (its own)
-    B->>B: Nothing newer, so nothing happens
-```
-
 The code is one class, [`RedisSync`](FinancialMonitor.Api/Services/RedisSync.cs). It's off unless `ConnectionStrings:Redis` is set, so a single instance needs no Redis.
 
 **Why the pods agree.** The same rule handles everything: only a strictly newer `timestamp` changes a row. Hearing your own message is a no-op, so there's no need to track which pod sent what. Updates that reach pods in different orders still end on the same status.
@@ -35,8 +17,6 @@ The code is one class, [`RedisSync`](FinancialMonitor.Api/Services/RedisSync.cs)
 **Why there are no sticky sessions.** The client skips SignalR's negotiate request and opens a WebSocket directly, so one connection is one request to one pod.
 
 **When Redis is down.** A POST still returns `202` straight away and the transaction is saved on the pod that received it. The failed publish is logged. Pods can start before Redis does, and they subscribe once it's reachable.
-
-This was checked with two containers from this image, running read-only and non-root with all capabilities dropped: pods started before Redis synced about a second after it came up, and 200 concurrent POSTs split across both pods gave 200 distinct messages to a client on each.
 
 ## Limits
 
