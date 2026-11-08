@@ -75,8 +75,12 @@
   border-bottom: none;
 }
 
-.monitor-empty {
-  padding: 24px;
+/* Qualified by .monitor-table so it outranks the generic cell padding and alignment. */
+.monitor-table .monitor-empty {
+  height: 200px; /* a table cell's height acts as a minimum, so the text can centre in it */
+  padding: 32px 24px;
   text-align: center;
+  vertical-align: middle;
+  white-space: normal;
   color: var(--muted);
 }

@@ -57,18 +57,18 @@ export function MonitorPage() {
             </tr>
           </thead>
           <tbody>
-            {visibleRows.map((row) => (
-              <TransactionRow key={row.transactionId} row={row} />
-            ))}
+            {visibleRows.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="monitor-empty">
+                  {rows.length === 0 ? 'No transactions yet.' : 'No transactions match this filter.'}
+                </td>
+              </tr>
+            ) : (
+              visibleRows.map((row) => <TransactionRow key={row.transactionId} row={row} />)
+            )}
           </tbody>
         </table>
       </div>
-
-      {visibleRows.length === 0 && (
-        <p className="monitor-empty">
-          {rows.length === 0 ? 'No transactions yet.' : 'No transactions match this filter.'}
-        </p>
-      )}
     </section>
   )
 }
