@@ -27,7 +27,7 @@ public sealed class TransactionJsonTests
     [Fact]
     public void A_timestamp_with_an_offset_is_written_back_as_utc()
     {
-        var transaction = JsonSerializer.Deserialize<Transaction>("""{"status":"Pending","timestamp":"2024-01-15T12:00:00+02:00"}""", Web)!;
+        var transaction = JsonSerializer.Deserialize<Transaction>("""{"currency":"USD","status":"Pending","timestamp":"2024-01-15T12:00:00+02:00"}""", Web)!;
 
         Assert.Equal(TestData.BaseTime, transaction.Timestamp);
         Assert.Contains("\"2024-01-15T10:00:00Z\"", JsonSerializer.Serialize(transaction, Web));

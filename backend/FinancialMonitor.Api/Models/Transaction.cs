@@ -7,7 +7,7 @@ internal sealed record Transaction
 {
     public Guid TransactionId { get; init; }
     public decimal Amount { get; init; }
-    public string Currency { get; init; } = "";
+    public required string Currency { get; init; }
     public TransactionStatus Status { get; init; }
 
     [JsonConverter(typeof(UtcTimestampConverter))]
