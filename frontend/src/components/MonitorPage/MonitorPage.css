@@ -20,6 +20,39 @@
   color: var(--completed-text);
 }
 
+.monitor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+/* Transform only, so it keeps turning while the page is busy. */
+.monitor-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: monitor-spin 800ms linear infinite;
+}
+
+@keyframes monitor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monitor-spinner {
+    animation-duration: 3s;
+  }
+}
+
 .monitor-filters {
   display: flex;
   flex-wrap: wrap;

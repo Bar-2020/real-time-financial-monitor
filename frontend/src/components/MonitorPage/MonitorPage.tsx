@@ -32,43 +32,52 @@ export function MonitorPage() {
         </p>
       </header>
 
-      <div className="monitor-filters" role="group" aria-label="Filter by status">
-        {FILTERS.map((filterOption) => (
-          <button
-            key={filterOption}
-            type="button"
-            className="monitor-filter"
-            aria-pressed={filter === filterOption}
-            onClick={() => setFilter(filterOption)}
-          >
-            {filterOption}
-          </button>
-        ))}
-      </div>
+      {connection === 'connecting' ? (
+        // The status above already says "Connecting…", so screen readers can skip the spinner.
+        <div className="monitor-loading">
+          <div className="monitor-spinner" aria-hidden="true" />
+        </div>
+      ) : (
+        <>
+          <div className="monitor-filters" role="group" aria-label="Filter by status">
+            {FILTERS.map((filterOption) => (
+              <button
+                key={filterOption}
+                type="button"
+                className="monitor-filter"
+                aria-pressed={filter === filterOption}
+                onClick={() => setFilter(filterOption)}
+              >
+                {filterOption}
+              </button>
+            ))}
+          </div>
 
-      <div className="monitor-table-scroll">
-        <table className="monitor-table">
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Amount</th>
-              <th scope="col">Status</th>
-              <th scope="col">Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibleRows.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="monitor-empty">
-                  {rows.length === 0 ? 'No transactions yet.' : 'No transactions match this filter.'}
-                </td>
-              </tr>
-            ) : (
-              visibleRows.map((row) => <TransactionRow key={row.transactionId} row={row} />)
-            )}
-          </tbody>
-        </table>
-      </div>
+          <div className="monitor-table-scroll">
+            <table className="monitor-table">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleRows.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="monitor-empty">
+                      {rows.length === 0 ? 'No transactions yet.' : 'No transactions match this filter.'}
+                    </td>
+                  </tr>
+                ) : (
+                  visibleRows.map((row) => <TransactionRow key={row.transactionId} row={row} />)
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </section>
   )
 }

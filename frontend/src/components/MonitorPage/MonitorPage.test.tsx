@@ -26,7 +26,7 @@ const bodyRows = () => screen.getAllByRole('row').slice(1)
 
 function show(displayedRows: DisplayedTransaction[], connection: ConnectionState = 'live') {
   vi.mocked(useTransactions).mockReturnValue({ rows: displayedRows, connection })
-  render(<MonitorPage />)
+  return render(<MonitorPage />)
 }
 
 describe('MonitorPage', () => {
@@ -60,6 +60,20 @@ describe('MonitorPage', () => {
     show([], connection)
 
     expect(screen.getByRole('status').textContent).toContain(label)
+  })
+
+  it('shows a spinner instead of the filters and the table while connecting', () => {
+    const { container } = show(rows, 'connecting')
+
+    expect(container.querySelector('.monitor-spinner')).toBeTruthy()
+    expect(screen.queryByRole('table')).toBeNull()
+    expect(screen.queryByRole('group', { name: 'Filter by status' })).toBeNull()
+  })
+
+  it('keeps the table while reconnecting', () => {
+    show(rows, 'reconnecting')
+
+    expect(bodyRows()).toHaveLength(rows.length)
   })
 
   it('explains an empty list', () => {
