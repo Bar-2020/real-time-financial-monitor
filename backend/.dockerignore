@@ -4,3 +4,4 @@ FinancialMonitor.Tests/
 k8s/
 Dockerfile
 README.md
+FinancialMonitor.AppHost/

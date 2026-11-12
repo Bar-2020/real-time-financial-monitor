@@ -35,27 +35,17 @@ Each step is only worth taking when the limit above it starts to matter:
 3. **A shared Postgres** as the durable record, so pods stop holding everything and history survives deploys.
 4. **Kafka or NATS** instead of Redis Pub/Sub, if messages must be replayed after an outage or volume outgrows one Redis.
 
-## Try two instances locally
+## Run several instances locally
+
+Aspire starts Redis and 5 API instances, gives each one the Redis address and opens a dashboard with their logs and health. It needs Docker running (CLI 25 or newer, check `docker --version`) and the .NET 10 SDK. From the repo root:
 
 ```bash
-docker run -d --name redis -p 6379:6379 redis:7-alpine
+dotnet run --project backend/FinancialMonitor.AppHost
 ```
 
-In two terminals, from the repo root:
+[`Program.cs`](FinancialMonitor.AppHost/Program.cs) is the whole setup. The instances are .NET processes behind a proxy on port 5080, and only Redis is a container, so use the Kubernetes steps below to run the Docker image itself. The AppHost isn't in the solution, so the API and its tests still build on the .NET 8 SDK.
 
-```bash
-ConnectionStrings__Redis=localhost:6379 dotnet run --project backend/FinancialMonitor.Api --no-launch-profile -- --urls http://localhost:5081
-```
-
-```bash
-ConnectionStrings__Redis=localhost:6379 dotnet run --project backend/FinancialMonitor.Api --no-launch-profile -- --urls http://localhost:5082
-```
-
-Connect a client to one instance and POST to the other, or run the automated version:
-
-```bash
-TEST_REDIS=localhost:6379 dotnet test backend/FinancialMonitor.sln
-```
+The automated multi-instance tests are in the [root README](../README.md#test).
 
 ## Docker
 

@@ -5,7 +5,7 @@ Accepts transactions over HTTP and pushes them to a live dashboard over WebSocke
 - **Backend:** .NET 8 minimal API, SignalR, optional Redis Pub/Sub
 - **Frontend:** React, TypeScript and Vite
 
-Running several instances, the Dockerfile and the Kubernetes manifests are covered in [backend/README.md](backend/README.md).
+Running several instances with Aspire, the Dockerfile and the Kubernetes manifests are covered in [backend/README.md](backend/README.md).
 
 ## Run
 
@@ -38,23 +38,15 @@ Open each route in its own tab to watch transactions arrive.
 
 ### Several instances
 
-With Kubernetes enabled in Docker Desktop (Settings, Kubernetes, Enable), one line builds the image and deploys 5 API instances plus Redis. It works in bash and PowerShell:
+Aspire starts Redis and 5 API instances with one command. It needs Docker running (CLI 25 or newer) and the .NET 10 SDK. The AppHost isn't in the solution, so everything else still builds on .NET 8:
 
 ```bash
-docker build -t financial-monitor-api:latest backend; kubectl --context docker-desktop apply -f backend/k8s
+dotnet run --project backend/FinancialMonitor.AppHost
 ```
 
-The cluster serves the API on port 5080, the same as `dotnet run`, so the dashboard needs no setup. Stop any local `dotnet run` first, install the frontend packages once, then start the dashboard:
+The instances share port 5080, the same as `dotnet run`, so the dashboard needs no setup. Stop any local `dotnet run` or Kubernetes deployment first, because they use port 5080 too. Then start the frontend as above and open <http://localhost:5173/monitor>. The Aspire dashboard that opens in the browser shows each instance's logs and health.
 
-```bash
-npm --prefix frontend ci
-```
-
-```bash
-npm --prefix frontend run dev
-```
-
-Then open <http://localhost:5173/monitor>. Cleanup and details are in [backend/README.md](backend/README.md).
+To run the Docker image on Kubernetes instead, see [backend/README.md](backend/README.md).
 
 ## Test
 
@@ -118,6 +110,7 @@ Used by the Kubernetes probes.
 ```
 backend/
   FinancialMonitor.Api/     API, hub, store, validation and Redis sync
+  FinancialMonitor.AppHost/ Aspire: Redis and 5 API instances for local runs
   FinancialMonitor.Tests/   xUnit tests, including a real SignalR client over WebSockets
   k8s/                      Kubernetes manifests
   Dockerfile
