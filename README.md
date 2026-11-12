@@ -44,7 +44,7 @@ Aspire starts Redis and 5 API instances with one command. It needs Docker runnin
 dotnet run --project backend/FinancialMonitor.AppHost
 ```
 
-The instances share port 5080, the same as `dotnet run`, so the dashboard needs no setup. Stop any local `dotnet run` first, start the frontend as above and open <http://localhost:5173/monitor>. The Aspire dashboard that opens in the browser shows each instance's logs and health.
+The instances share port 5080, the same as `dotnet run`, so the dashboard needs no setup. Stop any local `dotnet run` or Kubernetes deployment first, because they use port 5080 too. Then start the frontend as above and open <http://localhost:5173/monitor>. The Aspire dashboard that opens in the browser shows each instance's logs and health.
 
 To run the Docker image on Kubernetes instead, see [backend/README.md](backend/README.md).
 
